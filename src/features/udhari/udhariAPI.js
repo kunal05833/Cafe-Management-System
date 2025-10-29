@@ -1,0 +1,1 @@
+export { udhariService as udhariAPI } from '../../services/api/udhariService';

@@ -1,0 +1,1 @@
+export { menuAPI } from '../../services/api/menuAPI';

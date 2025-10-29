@@ -1,0 +1,1 @@
+export { orderService as ordersAPI } from '../../services/api/orderService';

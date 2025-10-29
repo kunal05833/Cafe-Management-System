@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { 
@@ -120,11 +121,46 @@ const authSlice = createSlice({
     error: null,
     isAuthenticated: false
   },
+=======
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { authService } from '../../services/firebase/auth';
+
+export const loginUser = createAsyncThunk('auth/login', async ({ email, password }) => {
+  const user = await authService.login(email, password);
+  return user;
+});
+
+export const signupUser = createAsyncThunk('auth/signup', async ({ email, password, name }) => {
+  const user = await authService.signup(email, password, name);
+  return user;
+});
+
+export const loginWithGoogle = createAsyncThunk('auth/googleLogin', async () => {
+  const user = await authService.loginWithGoogle();
+  return user;
+});
+
+export const logoutUser = createAsyncThunk('auth/logout', async () => {
+  await authService.logout();
+});
+
+const initialState = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+  error: null,
+};
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+>>>>>>> 6428b2e (Updated UI and fixed bugs)
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
     },
+<<<<<<< HEAD
     clearError: (state) => {
       state.error = null;
     }
@@ -185,6 +221,24 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         toast.success('Logged out successfully!');
       });
+=======
+    clearError: (state) => { state.error = null; },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginUser.pending, (s) => { s.isLoading = true; s.error = null; })
+      .addCase(loginUser.fulfilled, (s, a) => { s.isLoading = false; s.user = a.payload; s.isAuthenticated = true; })
+      .addCase(loginUser.rejected, (s, a) => { s.isLoading = false; s.error = a.error.message || 'Login failed'; })
+      .addCase(signupUser.pending, (s) => { s.isLoading = true; s.error = null; })
+      .addCase(signupUser.fulfilled, (s, a) => { s.isLoading = false; s.user = a.payload; s.isAuthenticated = true; })
+      .addCase(signupUser.rejected, (s, a) => { s.isLoading = false; s.error = a.error.message || 'Signup failed'; })
+      .addCase(loginWithGoogle.pending, (s) => { s.isLoading = true; s.error = null; })
+      .addCase(loginWithGoogle.fulfilled, (s, a) => { s.isLoading = false; s.user = a.payload; s.isAuthenticated = true; })
+      .addCase(loginWithGoogle.rejected, (s, a) => { s.isLoading = false; s.error = a.error.message || 'Google login failed'; })
+      .addCase(logoutUser.pending, (s) => { s.isLoading = true; })
+      .addCase(logoutUser.fulfilled, (s) => { s.isLoading = false; s.user = null; s.isAuthenticated = false; })
+      .addCase(logoutUser.rejected, (s, a) => { s.isLoading = false; s.error = a.error.message || 'Logout failed'; });
+>>>>>>> 6428b2e (Updated UI and fixed bugs)
   }
 });
 

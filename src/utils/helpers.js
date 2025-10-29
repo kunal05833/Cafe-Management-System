@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/utils/helpers.js
 import { format, formatDistanceToNow } from 'date-fns';
 
@@ -118,3 +119,54 @@ export const getBestSellingItems = (orders, limit = 5) => {
     .sort((a, b) => b.totalQuantity - a.totalQuantity)
     .slice(0, limit);
 };
+=======
+import { format, formatDistanceToNow, parseISO } from 'date-fns';
+import { DATE_FORMATS } from './constants';
+
+export const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency', currency: 'INR',
+    minimumFractionDigits: 0, maximumFractionDigits: 2,
+  }).format(Number.isFinite(amount) ? amount : 0);
+};
+
+export const formatDate = (date, fmt = DATE_FORMATS?.DISPLAY || 'dd MMM yyyy') => {
+  if (!date) return '';
+  const d = typeof date === 'string' ? parseISO(date) : date;
+  return format(d, fmt);
+};
+
+export const formatRelativeTime = (date) => {
+  if (!date) return '';
+  const d = typeof date === 'string' ? parseISO(date) : date;
+  return formatDistanceToNow(d, { addSuffix: true });
+};
+
+export const calculateOrderTotal = (items, taxRate = 0.05) => {
+  const subtotal = (items || []).reduce((s, it) => s + it.price * it.quantity, 0);
+  const tax = subtotal * taxRate;
+  return { subtotal, tax, total: subtotal + tax };
+};
+
+export const getOrderStatusColor = (status) => {
+  const map = { pending: 'warning', preparing: 'info', ready: 'success', delivered: 'default', cancelled: 'destructive' };
+  return map[status] || 'default';
+};
+
+export const generateOrderId = () => {
+  const ts = Date.now().toString(36);
+  const rnd = Math.random().toString(36).slice(2, 8);
+  return `ORD-${ts}-${rnd}`.toUpperCase();
+};
+
+export const canOrderOnCredit = (bal, limit, amt) => (Number(bal) + Number(amt)) <= Number(limit);
+export const groupItemsByCategory = (items) => (items || []).reduce((acc, it) => { (acc[it.category || 'uncategorized'] ||= []).push(it); return acc; }, {});
+export const calculatePercentage = (value, total) => !total ? 0 : Number(((value / total) * 100).toFixed(2));
+export const debounce = (fn, wait = 300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); }; };
+export const truncateText = (t, m = 80) => (!t || t.length <= m) ? (t || '') : `${t.slice(0, m)}...`;
+export const getInitials = (n) => (!n ? '' : n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2));
+export const isValidEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+export const isValidPhone = (p) => /^[6-9]\d{9}$/.test(p);
+export const sortByKey = (arr, key, order = 'asc') => [...(arr || [])].sort((a,b)=> order==='asc' ? (a[key]>b[key]?1:-1) : (a[key]<b[key]?1:-1));
+export const getGreeting = () => (new Date().getHours()<12?'Good Morning':new Date().getHours()<17?'Good Afternoon':'Good Evening');
+>>>>>>> 6428b2e (Updated UI and fixed bugs)
