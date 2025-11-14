@@ -1,158 +1,34 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-<<<<<<< HEAD
-=======
-  darkMode: ["class"],
->>>>>>> 6428b2e (Updated UI and fixed bugs)
+export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
-<<<<<<< HEAD
     extend: {
       colors: {
         primary: {
-=======
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
->>>>>>> 6428b2e (Updated UI and fixed bugs)
-          50: '#fef3c7',
-          100: '#fde68a',
-          200: '#fcd34d',
-          300: '#fbbf24',
-          400: '#f59e0b',
-          500: '#d97706',
-          600: '#b45309',
-          700: '#92400e',
-          800: '#78350f',
-          900: '#451a03',
-<<<<<<< HEAD
-        }
+          50: '#fef8f0',
+          100: '#fdefd9',
+          200: '#fbddb3',
+          300: '#f8c583',
+          400: '#f5a451',
+          500: '#f28b2c',
+          600: '#e37021',
+          700: '#bc561c',
+          800: '#96451d',
+          900: '#793b1a',
+        },
       },
       animation: {
-        'slide-in': 'slideIn 0.3s ease-out',
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'bounce-in': 'bounceIn 0.5s ease-out',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'spin-slow': 'spin 3s linear infinite',
+        'bounce-slow': 'bounce 3s infinite',
       },
-      keyframes: {
-        slideIn: {
-          '0%': { transform: 'translateX(100%)' },
-          '100%': { transform: 'translateX(0)' },
-        },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        bounceIn: {
-          '0%': { 
-            opacity: '0',
-            transform: 'scale(0.3)'
-          },
-          '50%': {
-            transform: 'scale(1.05)'
-          },
-          '70%': {
-            transform: 'scale(0.9)'
-          },
-          '100%': {
-            opacity: '1',
-            transform: 'scale(1)'
-          }
-        }
+      backdropBlur: {
+        xs: '2px',
       },
-      fontFamily: {
-        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-      },
-      boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'glow': '0 0 20px rgba(217, 119, 6, 0.3)',
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-      }
     },
   },
   plugins: [],
-=======
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: 0 },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
-        },
-        "slide-in": {
-          "0%": { transform: "translateX(100%)" },
-          "100%": { transform: "translateX(0)" },
-        },
-        "fade-in": {
-          "0%": { opacity: 0 },
-          "100%": { opacity: 1 },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "slide-in": "slide-in 0.3s ease-out",
-        "fade-in": "fade-in 0.3s ease-out",
-        "float": "float 3s ease-in-out infinite",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
->>>>>>> 6428b2e (Updated UI and fixed bugs)
 }

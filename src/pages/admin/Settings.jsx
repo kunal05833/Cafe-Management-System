@@ -1,265 +1,219 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings as SettingsIcon, Store, Bell, Shield, Palette } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
-import { Label } from '../../components/ui/Label';
-import { Switch } from '../../components/ui/Switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs';
-import PageHeader from '../../components/common/PageHeader';
-import { toast } from 'sonner';
+import { Save, Bell, Shield, CreditCard, Store, Mail, Globe } from 'lucide-react';
 
 const Settings = () => {
   const [settings, setSettings] = useState({
-    storeName: 'Café Delight',
-    storeEmail: 'hello@cafedelight.com',
-    storePhone: '+91 98765 43210',
-    storeAddress: '123 Coffee Street, Mumbai',
-    taxRate: 5,
+    storeName: 'Cafe Hub',
+    email: 'admin@cafehub.com',
+    phone: '+91 9876543210',
+    address: '123 Main Street, City, State',
     currency: 'INR',
-    notifications: {
-      newOrder: true,
-      lowStock: true,
-      dailyReport: false,
-      customerFeedback: true
-    },
-    theme: 'light',
-    autoAcceptOrders: false,
-    orderPrefix: 'ORD',
-    udhariLimit: 5000
+    timezone: 'Asia/Kolkata',
+    emailNotifications: true,
+    smsNotifications: false,
+    orderNotifications: true,
+    paymentNotifications: true,
+    minOrderValue: 50,
+    deliveryCharge: 30,
+    taxRate: 5,
+    creditLimit: 5000
   });
 
-  const handleSave = () => {
-    // Save settings to Firebase
-    toast.success('Settings saved successfully!');
+  const [saving, setSaving] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setSettings({
+      ...settings,
+      [name]: type === 'checkbox' ? checked : value
+    });
   };
 
-  const handleChange = (field, value) => {
-    setSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleSave = async () => {
+    setSaving(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setSaving(false);
+    alert('Settings saved successfully!');
   };
 
-  const handleNotificationChange = (type, value) => {
-    setSettings(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [type]: value
-      }
-    }));
-  };
+  const sections = [
+    {
+      title: 'Store Information',
+      icon: Store,
+      color: 'from-blue-500 to-cyan-600',
+      fields: [
+        { name: 'storeName', label: 'Store Name', type: 'text' },
+        { name: 'email', label: 'Email', type: 'email' },
+        { name: 'phone', label: 'Phone', type: 'tel' },
+        { name: 'address', label: 'Address', type: 'text' }
+      ]
+    },
+    {
+      title: 'Regional Settings',
+      icon: Globe,
+      color: 'from-purple-500 to-pink-600',
+      fields: [
+        { 
+          name: 'currency', 
+          label: 'Currency', 
+          type: 'select',
+          options: ['INR', 'USD', 'EUR', 'GBP']
+        },
+        { 
+          name: 'timezone', 
+          label: 'Timezone', 
+          type: 'select',
+          options: ['Asia/Kolkata', 'America/New_York', 'Europe/London']
+        }
+      ]
+    },
+    {
+      title: 'Notifications',
+      icon: Bell,
+      color: 'from-amber-500 to-orange-600',
+      fields: [
+        { name: 'emailNotifications', label: 'Email Notifications', type: 'checkbox' },
+        { name: 'smsNotifications', label: 'SMS Notifications', type: 'checkbox' },
+        { name: 'orderNotifications', label: 'Order Notifications', type: 'checkbox' },
+        { name: 'paymentNotifications', label: 'Payment Notifications', type: 'checkbox' }
+      ]
+    },
+    {
+      title: 'Business Settings',
+      icon: CreditCard,
+      color: 'from-green-500 to-emerald-600',
+      fields: [
+        { name: 'minOrderValue', label: 'Minimum Order Value (₹)', type: 'number' },
+        { name: 'deliveryCharge', label: 'Delivery Charge (₹)', type: 'number' },
+        { name: 'taxRate', label: 'Tax Rate (%)', type: 'number' },
+        { name: 'creditLimit', label: 'Default Credit Limit (₹)', type: 'number' }
+      ]
+    }
+  ];
 
   return (
-    <div className="p-6 space-y-6">
-      <PageHeader
-        title="Settings"
-        subtitle="Configure your café management system"
-      />
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2">
+              Settings ⚙️
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
+              Configure your cafe settings
+            </p>
+          </div>
 
-      <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced</TabsTrigger>
-        </TabsList>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+          >
+            <Save className="w-5 h-5" />
+            {saving ? 'Saving...' : 'Save Changes'}
+          </motion.button>
+        </div>
 
-        <TabsContent value="general">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Store className="w-5 h-5" />
-                Store Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="storeName">Store Name</Label>
-                  <Input
-                    id="storeName"
-                    value={settings.storeName}
-                    onChange={(e) => handleChange('storeName', e.target.value)}
-                  />
+        {/* Settings Sections */}
+        <div className="space-y-6">
+          {sections.map((section, sectionIndex) => (
+            <motion.div
+              key={sectionIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: sectionIndex * 0.1 }}
+              className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`w-12 h-12 bg-gradient-to-br ${section.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                  <section.icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="storeEmail">Email</Label>
-                  <Input
-                    id="storeEmail"
-                    type="email"
-                    value={settings.storeEmail}
-                    onChange={(e) => handleChange('storeEmail', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="storePhone">Phone</Label>
-                  <Input
-                    id="storePhone"
-                    value={settings.storePhone}
-                    onChange={(e) => handleChange('storePhone', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="taxRate">Tax Rate (%)</Label>
-                  <Input
-                    id="taxRate"
-                    type="number"
-                    value={settings.taxRate}
-                    onChange={(e) => handleChange('taxRate', parseFloat(e.target.value))}
-                  />
-                </div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {section.title}
+                </h2>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="storeAddress">Address</Label>
-                <textarea
-                  id="storeAddress"
-                  value={settings.storeAddress}
-                  onChange={(e) => handleChange('storeAddress', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  rows="3"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="notifications">
-          <Card>
-                        <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5" />
-                Notification Preferences
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">New Order Notifications</p>
-                    <p className="text-sm text-muted-foreground">Get notified when new orders are placed</p>
+              <div className="grid md:grid-cols-2 gap-6">
+                {section.fields.map((field, fieldIndex) => (
+                  <div key={fieldIndex} className={field.type === 'checkbox' ? 'md:col-span-2' : ''}>
+                    {field.type === 'checkbox' ? (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                        <input
+                          type="checkbox"
+                          id={field.name}
+                          name={field.name}
+                          checked={settings[field.name]}
+                          onChange={handleChange}
+                          className="w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                        />
+                        <label htmlFor={field.name} className="font-medium text-gray-900 dark:text-white cursor-pointer">
+                          {field.label}
+                        </label>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          {field.label}
+                        </label>
+                        {field.type === 'select' ? (
+                          <select
+                            name={field.name}
+                            value={settings[field.name]}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 focus:border-amber-500 dark:focus:border-amber-500 outline-none transition-all text-gray-900 dark:text-white"
+                          >
+                            {field.options.map(option => (
+                              <option key={option} value={option}>{option}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={field.type}
+                            name={field.name}
+                            value={settings[field.name]}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 focus:border-amber-500 dark:focus:border-amber-500 outline-none transition-all text-gray-900 dark:text-white"
+                          />
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <Switch
-                    checked={settings.notifications.newOrder}
-                    onCheckedChange={(value) => handleNotificationChange('newOrder', value)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Low Stock Alerts</p>
-                    <p className="text-sm text-muted-foreground">Get alerts when items are running low</p>
-                  </div>
-                  <Switch
-                    checked={settings.notifications.lowStock}
-                    onCheckedChange={(value) => handleNotificationChange('lowStock', value)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Daily Reports</p>
-                    <p className="text-sm text-muted-foreground">Receive daily sales and performance reports</p>
-                  </div>
-                  <Switch
-                    checked={settings.notifications.dailyReport}
-                    onCheckedChange={(value) => handleNotificationChange('dailyReport', value)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Customer Feedback</p>
-                    <p className="text-sm text-muted-foreground">Get notified about customer reviews</p>
-                  </div>
-                  <Switch
-                    checked={settings.notifications.customerFeedback}
-                    onCheckedChange={(value) => handleNotificationChange('customerFeedback', value)}
-                  />
-                </div>
+                ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </motion.div>
+          ))}
+        </div>
 
-        <TabsContent value="appearance">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="w-5 h-5" />
-                Appearance Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Theme</Label>
-                <div className="grid grid-cols-3 gap-4">
-                  {['light', 'dark', 'system'].map((theme) => (
-                    <button
-                      key={theme}
-                      onClick={() => handleChange('theme', theme)}
-                      className={`p-4 rounded-lg border-2 transition-all ${
-                        settings.theme === theme
-                          ? 'border-primary bg-primary/10'
-                          : 'border-muted hover:border-primary/50'
-                      }`}
-                    >
-                      <p className="font-medium capitalize">{theme}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="advanced">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Advanced Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Auto-Accept Orders</p>
-                    <p className="text-sm text-muted-foreground">Automatically accept new orders</p>
-                  </div>
-                  <Switch
-                    checked={settings.autoAcceptOrders}
-                    onCheckedChange={(value) => handleChange('autoAcceptOrders', value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="orderPrefix">Order ID Prefix</Label>
-                  <Input
-                    id="orderPrefix"
-                    value={settings.orderPrefix}
-                    onChange={(e) => handleChange('orderPrefix', e.target.value)}
-                    placeholder="ORD"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="udhariLimit">Default Udhari Limit (₹)</Label>
-                  <Input
-                    id="udhariLimit"
-                    type="number"
-                    value={settings.udhariLimit}
-                    onChange={(e) => handleChange('udhariLimit', parseFloat(e.target.value))}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <div className="flex justify-end">
-        <Button variant="gradient" onClick={handleSave}>
-          Save Settings
-        </Button>
+        {/* Danger Zone */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-8 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-3xl p-6"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Shield className="w-6 h-6 text-red-600 dark:text-red-400" />
+            <h2 className="text-xl font-bold text-red-600 dark:text-red-400">
+              Danger Zone
+            </h2>
+          </div>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
+            These actions are irreversible. Please proceed with caution.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all">
+              Reset All Data
+            </button>
+            <button className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all">
+              Export Database
+            </button>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

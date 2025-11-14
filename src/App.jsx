@@ -1,253 +1,234 @@
-<<<<<<< HEAD
-// src/App.jsx
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, db } from './firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
-import { setUser } from './features/auth/authSlice';
-import { Toaster } from 'react-hot-toast';
+import { useContext } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthContext } from './context/AuthContext'; // ✅ Make sure AuthContext is a named export
 
-// Components
-import Navbar from './components/common/Navbar';
-import ProtectedRoute from './components/common/ProtectedRoute';
-import LoadingSpinner from './components/common/LoadingSpinner';
+// ==================== LAYOUTS ====================
+import AdminLayout from './layouts/AdminLayout';
+import CustomerLayout from './layouts/CustomerLayout';
 
-// Pages
-import Home from './pages/Home';
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
+// ==================== AUTH PAGES ====================
+import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
+import ForgotPassword from './pages/auth/ForgotPassword';
 
-// Customer Components
-import Menu from './components/customer/Menu';
-import Cart from './components/customer/Cart';
-import OrderTracking from './components/customer/OrderTracking';
-import UdhariPage from './components/customer/UdhariPage';
+// ==================== CUSTOMER PAGES ====================
+import Home from './pages/customer/Home';
+import Menu from './pages/customer/Menu';
+import Cart from './pages/customer/Cart';
+import Checkout from './pages/customer/Checkout';
+import Orders from './pages/customer/Orders';
+import OrderDetail from './pages/customer/OrderDetail';
+import OrderTracking from './pages/customer/OrderTracking';
+import Profile from './pages/customer/Profile';
+import Notifications from './pages/customer/Notifications';
+import Rewards from './pages/customer/Rewards';
+import Reviews from './pages/customer/Reviews';
+import TableReservation from './pages/customer/TableReservation';
+import Udhari from './pages/customer/Udhari';
 
-// Admin Components
-import AdminDashboard from './components/admin/AdminDashboard';
-import ManageMenu from './components/admin/ManageMenu';
-import ManageOrders from './components/admin/ManageOrders';
-import UdhariManagement from './components/admin/UdhariManagement';
+// ==================== ADMIN PAGES ====================
+import Dashboard from './pages/admin/Dashboard';
+import ManageMenu from './pages/admin/ManageMenu';
+import ManageOrders from './pages/admin/ManageOrders';
+import Customers from './pages/admin/Customers';
+import Reports from './pages/admin/Reports';
+import UdhariManagement from './pages/admin/UdhariManagement';
+import Settings from './pages/admin/Settings';
 
-function App() {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = React.useState(true);
+// ==================== COMMON PAGES ====================
+import NotFound from './pages/common/NotFound';
+import ErrorPage from './pages/common/ErrorPage';
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Get user data from Firestore
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          dispatch(setUser({
-            uid: user.uid,
-            email: user.email,
-            ...userDoc.data()
-          }));
-        }
-      } else {
-        dispatch(setUser(null));
-      }
-      setLoading(false);
-    });
+// ==================== LOADING COMPONENT ====================
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-600 font-medium">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
-    return unsubscribe;
-  }, [dispatch]);
+// ==================== PROTECTED ROUTE - ADMIN ====================
+function AdminRoute({ children }) {
+  const { user, isAdmin, loading } = useContext(AuthContext);
 
   if (loading) {
-    return <LoadingSpinner fullScreen />;
+    return <LoadingScreen />;
   }
 
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+// ==================== PROTECTED ROUTE - CUSTOMER ====================
+function CustomerRoute({ children }) {
+  const { user, isCustomer, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isCustomer()) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return children;
+}
+
+// ==================== PUBLIC ROUTE ====================
+function PublicRoute({ children }) {
+  const { user, isAdmin, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (user) {
+    if (isAdmin()) {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else {
+      return <Navigate to="/" replace />;
+    }
+  }
+
+  return children;
+}
+
+// ==================== MAIN APP COMPONENT ====================
+export default function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <Routes>
-          {/* Public Routes */}
+    <BrowserRouter>
+      <Routes>
+        {/* ==================== PUBLIC ROUTES ==================== */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+
+        {/* ==================== ADMIN ROUTES ==================== */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          {/* Admin Dashboard - Default */}
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+
+          {/* Admin Dashboard */}
+          <Route path="dashboard" element={<Dashboard />} />
+
+          {/* Manage Menu */}
+          <Route path="menu" element={<ManageMenu />} />
+
+          {/* Manage Orders */}
+          <Route path="orders" element={<ManageOrders />} />
+
+          {/* Customers Management */}
+          <Route path="customers" element={<Customers />} />
+
+          {/* Reports & Analytics */}
+          <Route path="reports" element={<Reports />} />
+
+          {/* Udhari Management */}
+          <Route path="udhari" element={<UdhariManagement />} />
+
+          {/* Settings */}
+          <Route path="settings" element={<Settings />} />
+        </Route>
+
+        {/* ==================== CUSTOMER ROUTES ==================== */}
+        <Route
+          element={
+            <CustomerRoute>
+              <CustomerLayout />
+            </CustomerRoute>
+          }
+        >
+          {/* Home Page */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+
+          {/* Menu */}
           <Route path="/menu" element={<Menu />} />
 
-          {/* Customer Protected Routes */}
-          <Route path="/cart" element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          } />
-          <Route path="/orders" element={
-            <ProtectedRoute>
-              <OrderTracking />
-            </ProtectedRoute>
-          } />
-          <Route path="/udhari" element={
-            <ProtectedRoute>
-              <UdhariPage />
-            </ProtectedRoute>
-          } />
+          {/* Shopping Cart */}
+          <Route path="/cart" element={<Cart />} />
 
-          {/* Admin Protected Routes */}
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute adminOnly>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/menu" element={
-            <ProtectedRoute adminOnly>
-              <ManageMenu />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/orders" element={
-            <ProtectedRoute adminOnly>
-              <ManageOrders />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/udhari" element={
-            <ProtectedRoute adminOnly>
-              <UdhariManagement />
-            </ProtectedRoute>
-          } />
+          {/* Checkout */}
+          <Route path="/checkout" element={<Checkout />} />
 
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        
-        {/* Toast Notifications */}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              style: {
-                background: '#10b981',
-              },
-            },
-            error: {
-              style: {
-                background: '#ef4444',
-              },
-            },
-          }}
-        />
-      </div>
-    </Router>
+          {/* Orders */}
+          <Route path="/orders" element={<Orders />} />
+
+          {/* Order Detail */}
+          <Route path="/orders/:id" element={<OrderDetail />} />
+
+          {/* Order Tracking */}
+          <Route path="/track/:id" element={<OrderTracking />} />
+
+          {/* User Profile */}
+          <Route path="/profile" element={<Profile />} />
+
+          {/* Notifications */}
+          <Route path="/notifications" element={<Notifications />} />
+
+          {/* Rewards & Loyalty */}
+          <Route path="/rewards" element={<Rewards />} />
+
+          {/* Reviews */}
+          <Route path="/reviews" element={<Reviews />} />
+
+          {/* Table Reservation */}
+          <Route path="/reservations" element={<TableReservation />} />
+
+          {/* Customer Udhari */}
+          <Route path="/udhari" element={<Udhari />} />
+        </Route>
+
+        {/* ==================== ERROR ROUTES ==================== */}
+        <Route path="/error" element={<ErrorPage />} />
+
+        {/* 404 - Not Found */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
-=======
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "./services/firebase/config";
-import { setUser } from "./features/auth/authSlice";
-import { Toaster } from "sonner";
-
-// Layouts
-import CustomerLayout from "./layouts/CustomerLayout";
-import AdminLayout from "./layouts/AdminLayout";
-import AuthLayout from "./layouts/AuthLayout";
-
-// Customer Pages
-import Home from "./pages/customer/Home";
-import Menu from "./pages/customer/Menu";
-import Cart from "./pages/customer/Cart";
-import Orders from "./pages/customer/Orders";
-import Udhari from "./pages/customer/Udhari";
-import Profile from "./pages/customer/Profile";
-
-// Admin Pages
-import Dashboard from "./pages/admin/Dashboard";
-import ManageMenu from "./pages/admin/ManageMenu";
-import ManageOrders from "./pages/admin/ManageOrders";
-import UdhariManagement from "./pages/admin/UdhariManagement";
-import Customers from "./pages/admin/Customers";
-import Reports from "./pages/admin/Reports";
-import Settings from "./pages/admin/Settings";
-
-// Auth Pages
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-
-// Common
-import NotFound from "./pages/common/NotFound";
-import ProtectedRoute from "./components/common/ProtectedRoute";
-import PublicOnlyRoute from "./components/common/PublicOnlyRoute";
-
-function App() {
-const dispatch = useDispatch();
-const [boot, setBoot] = useState(true);
-
-useEffect(() => {
-const unsub = onAuthStateChanged(auth, async (fbUser) => {
-try {
-if (fbUser) {
-const snap = await getDoc(doc(db, "users", fbUser.uid));
-const profile = snap.exists() ? snap.data() : {};
-dispatch(setUser({ uid: fbUser.uid, email: fbUser.email, ...profile }));
-} else {
-dispatch(setUser(null));
 }
-} catch (err) {
-console.error("Auth bootstrap error:", err);
-dispatch(setUser(null));
-} finally {
-setBoot(false);
-}
-});
-return () => unsub();
-}, [dispatch]);
-
-if (boot) {
-return (
-<div className="min-h-screen grid place-items-center">
-<div className="h-10 w-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-</div>
-);
-}
-
-return (
-<Router>
-<Routes>
-{/* Customer */}
-<Route path="/" element={<CustomerLayout />}>
-<Route index element={<Home />} />
-<Route path="menu" element={<Menu />} />
-<Route path="customer/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-<Route path="customer/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-<Route path="customer/udhari" element={<ProtectedRoute><Udhari /></ProtectedRoute>} />
-<Route path="customer/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-</Route>
-    {/* Auth */}
-    <Route element={<AuthLayout />}>
-      <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-      <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
-      <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
-    </Route>
-
-    {/* Admin */}
-    <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout /></ProtectedRoute>}>
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="menu" element={<ManageMenu />} />
-      <Route path="orders" element={<ManageOrders />} />
-      <Route path="udhari" element={<UdhariManagement />} />
-      <Route path="customers" element={<Customers />} />
-      <Route path="reports" element={<Reports />} />
-      <Route path="settings" element={<Settings />} />
-    </Route>
-
-    <Route path="/home" element={<Navigate to="/" replace />} />
-    <Route path="*" element={<NotFound />} />
-  </Routes>
-  <Toaster richColors position="top-right" />
-</Router>
-);
->>>>>>> 6428b2e (Updated UI and fixed bugs)
-}
-
-export default App;

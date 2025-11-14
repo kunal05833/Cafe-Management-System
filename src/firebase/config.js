@@ -1,10 +1,10 @@
-// src/firebase/config.js
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// Firebase configuration - Replace with your config
+// Your web app's Firebase configuration
+// Replace these with your actual Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyA_32PqATbpRxzuWu2FQ3wr4LK8CK6cCWU",
   authDomain: "cafe-management-e0d1f.firebaseapp.com",
@@ -17,9 +17,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize services
+// Initialize Firebase services
 export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
